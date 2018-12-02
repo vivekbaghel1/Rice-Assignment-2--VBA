@@ -1,0 +1,158 @@
+Sub TriVolume()
+
+' Define Variable
+
+Dim Ticker As String
+Dim Total_Volume As Double
+
+    Total_Volume = 0
+
+Dim YearStart, YearEnd, Yearly_Change, MaxIncrease, MaxDecrease, Max_Total_Volume As Double
+
+    MaxIncrease = 0
+
+    MaxDecrease = 0
+
+    Max_Total_Volume = 0
+    
+
+Dim Tic_Assg_Table As Integer
+
+    Tic_Assg_Table = 2
+
+'Loop WorkSheets
+
+    For Each ws In Worksheets
+
+    Tic_Assg_Table = 2
+
+    Dim i, j As Double
+
+    ws.Range("I1").Value = "Ticker"
+    ws.Range("J1").Value = "Yearly Change"
+    ws.Range("K1").Value = "Percent Change"
+    ws.Range("L1").Value = "Total Stock Volume"
+
+    ws.Range("O2").Value = "Greatest % Increase"
+    ws.Range("O3").Value = "Greatest % Decrease"
+    ws.Range("O4").Value = "Greatest Total Volume"
+    ws.Range("P1").Value = "Ticker"
+    ws.Range("Q1").Value = "Value"
+
+
+    'last row in each sheet
+    lastrow = ws.Cells(Rows.Count, 1).End(xlUp).Row
+
+    'last column in each sheet
+    lastcolumn = ws.Cells(1, Columns.Count).End(xlToLeft).Column
+
+        For i = 2 To lastrow
+
+            If ws.Cells(i - 1, 1).Value <> ws.Cells(i, 1) Then
+
+                YearStart = ws.Cells(i, 3).Value
+
+            End If
+
+
+            If ws.Cells(i + 1, 1).Value <> ws.Cells(i, 1).Value Then
+   
+                Ticker = ws.Cells(i, 1).Value
+
+                Total_Volume = (Total_Volume) + ws.Cells(i, 7).Value
+
+                ws.Range("I" & Tic_Assg_Table).Value = Ticker
+
+                ws.Range("L" & Tic_Assg_Table).Value = Total_Volume
+
+                YearEnd = ws.Cells(i, 6).Value
+
+                Yearly_Change = YearEnd - YearStart
+
+                ws.Range("J" & Tic_Assg_Table).Value = Yearly_Change
+
+                If Yearly_Change >= 0 And YearStart = 0 Then
+
+                    YearStart = 1
+
+                End If
+
+                ws.Range("K" & Tic_Assg_Table).Value = (Yearly_Change / YearStart)
+
+                ws.Range("K" & Tic_Assg_Table).NumberFormat = "0.00%"
+
+                    If Yearly_Change < 0 Then
+                
+                        ws.Range("J" & Tic_Assg_Table).Interior.ColorIndex = 3
+
+                    ElseIf Yearly_Change > 0 Then
+
+                        ws.Range("J" & Tic_Assg_Table).Interior.ColorIndex = 10
+
+                    End If
+
+                    
+                Tic_Assg_Table = Tic_Assg_Table + 1
+
+                'MsgBox (Total_Volume)
+            
+                Total_Volume = 0
+
+                Yearly_Change = 0
+
+            Else
+ 
+                Total_Volume = (Total_Volume) + ws.Cells(i, 7).Value
+
+            End If
+    
+        Next i
+
+'Calculate Max and Min Percentage Change
+
+        lastrow1 = ws.Cells(Rows.Count, 11).End(xlUp).Row
+        
+        For j = 2 To lastrow1
+    
+            If ws.Cells(j, 11).Value > MaxIncrease Then
+            
+                MaxIncrease = ws.Cells(j, 11).Value
+                ws.Range("Q2").Value = MaxIncrease
+                ws.Range("P2").Value = ws.Cells(j, 9).Value
+                ws.Range("Q2").NumberFormat = "0.00%"
+
+            End If
+
+            If ws.Cells(j, 11).Value < MaxDecrease Then
+            
+                MaxDecrease = ws.Cells(j, 11).Value
+                ws.Range("Q3").Value = MaxDecrease
+                ws.Range("P3").Value = ws.Cells(j, 9).Value
+                ws.Range("Q3").NumberFormat = "0.00%"
+
+            End If
+
+'Calculate Max Total Volume
+
+
+            If ws.Cells(j, 12) > Max_Total_Volume Then
+                
+                Max_Total_Volume = ws.Cells(j, 12).Value
+                ws.Range("Q4").Value = Max_Total_Volume
+                ws.Range("P4").Value = ws.Cells(j, 9).Value
+
+            End If
+
+
+        Next j
+     
+    MaxIncrease = 0
+
+    MaxDecrease = 0
+
+    Max_Total_Volume = 0
+
+
+    Next ws
+
+End Sub
